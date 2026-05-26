@@ -1,0 +1,21 @@
+.list-card {
+    /* Pode ser um pouco mais largo que o formulário para caber a tabela bem */
+    max-width: 800px; 
+    margin-bottom: 8px;
+}
+
+table {
+    width: 100%;
+    margin-top: 16px;
+}
+
+/* Um toque visual simples para diferenciar o que foi pago do que está pendente */
+.badge-pago {
+    color: green;
+    font-weight: bold;
+}
+
+.badge-pendente {
+    color: darkorange;
+    font-weight: bold;
+}

@@ -1,4 +1,4 @@
-export interface TypePayment {
+export interface PaymentType {
     idTypePayments: number,
     name: string
 }
