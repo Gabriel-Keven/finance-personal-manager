@@ -1,4 +1,4 @@
-import { TypePayment } from "./type-payment.model";
+import { PaymentType } from "./payment-type.model";
 import { Topic } from "./topic.model";
 
 export interface Expense {
@@ -6,13 +6,13 @@ export interface Expense {
     name: string,
     description: string,
     value: number,
-    datePurchase: string,
-    hourPurchase: string,
+    datePurchase: string | null,
+    hourPurchase: string | null,
     paid: boolean,
     monthly: boolean,
     installment: boolean,
-    numberInstallments?: number,
-    valueInstallments?:number,
+    numberInstallments: number,
+    valueInstallments:number,
     topic: Topic,
-    typePayment: TypePayment
+    typePayment: PaymentType
 }
