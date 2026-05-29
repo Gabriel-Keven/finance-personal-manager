@@ -20,6 +20,10 @@ export class ExpenseService {
     return this.http.get<Expense[]>(this.apiUrl);
   }
 
+  public deleteExpense(id: number): Observable<void>{
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
   public addExpense(expense: Expense):Observable<Expense> {
     return this.http.post<Expense>(this.apiUrl, expense).pipe(
       tap({

@@ -71,6 +71,7 @@
                 <mat-error>{{ showErros(expenseForm.monthly) }}</mat-error>
                 }
             </mat-form-field>
+            @if(expenseModel().monthly===false){
 
             <mat-form-field>
                 <mat-label>Compra Parcelada</mat-label>
@@ -82,6 +83,7 @@
                 <mat-error>{{ showErros(expenseForm.installment) }}</mat-error>
                 }
             </mat-form-field>
+            }
             @if(expenseModel().installment===true){
 
             <mat-form-field>
