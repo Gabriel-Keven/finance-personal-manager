@@ -1,16 +1,18 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 
-//Components
-import { ExpenseForm } from "./components/exepense-form/expense-form";
-import { ExpenseList } from './components/expense-list/expense-list';
+//Angular material
+import { MatButtonModule } from '@angular/material/button';
+
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [ExpenseForm, ExpenseList],
+  imports: [MatButtonModule, RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 
 })
 export class App {
+  title ='finance-personal-manager';
 }

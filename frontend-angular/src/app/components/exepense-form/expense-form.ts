@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Expense } from '../../models/expense.model';
-import { form, FormField, required, min, maxLength, validate, FormRoot } from '@angular/forms/signals';
+import { form, FormField, required, min, maxLength, validate, FormRoot, } from '@angular/forms/signals';
 import { firstValueFrom } from 'rxjs';
 
 // Angular Material
@@ -12,6 +12,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatTimepickerModule } from '@angular/material/timepicker';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 //Services
 import { TopicService } from '../../services/topic.service';
@@ -20,7 +21,7 @@ import { ExpenseService } from '../../services/expense.service';
 
 @Component({
   selector: 'app-expense-form',
-  imports: [FormField, FormRoot, MatFormFieldModule, MatInputModule, MatSelectModule, MatCardModule, MatButtonModule, MatDatepickerModule, MatTimepickerModule],
+  imports: [FormField, FormRoot, MatFormFieldModule, MatInputModule, MatSelectModule, MatCardModule, MatButtonModule, MatDatepickerModule, MatTimepickerModule, MatSnackBarModule],
   templateUrl: './expense-form.html',
   styleUrl: './expense-form.scss',
   providers: [provideNativeDateAdapter(), { provide: MAT_DATE_LOCALE, useValue: 'pt-BR' }]
@@ -31,6 +32,7 @@ export class ExpenseForm implements OnInit {
   private topicService = inject(TopicService);
   private paymentTypeService = inject(PaymentTypeService);
   private expenseService = inject(ExpenseService);
+  private snackBar = inject(MatSnackBar);
 
   public topicsList = this.topicService.topicsList;
   public paymentsTypeList = this.paymentTypeService.typePaymentsList;
@@ -83,12 +85,28 @@ export class ExpenseForm implements OnInit {
       message: 'A hora da compra é obrigatória.'
     });
 
-    required(schemaPath.topic, {
-      message: 'Selecione uma categoria para a despesa.'
+    // ==========================================
+    // SUBSTITUA OS REQUIRED() DE TOPIC E TYPEPAYMENT POR ISTO:
+    // ==========================================
+
+    validate(schemaPath.topic, (ctx) => {
+      const categoriaSelecionada = ctx.value();
+
+      // Se não houver categoria, ou se o ID ainda for 0 (o nosso valor inicial em branco)
+      if (!categoriaSelecionada || categoriaSelecionada.idTopics === 0) {
+        return { kind: 'required', message: 'Selecione uma categoria para a despesa.' };
+      }
+      return null;
     });
 
-    required(schemaPath.typePayment, {
-      message: 'Selecione a forma de pagamento.'
+    validate(schemaPath.typePayment, (ctx) => {
+      const pagamentoSelecionado = ctx.value();
+
+      // Se não houver pagamento, ou se o ID ainda for 0
+      if (!pagamentoSelecionado || pagamentoSelecionado.idTypePayments === 0) {
+        return { kind: 'required', message: 'Selecione a forma de pagamento.' };
+      }
+      return null;
     });
 
     validate(schemaPath.numberInstallments, (ctx) => {
@@ -122,8 +140,7 @@ export class ExpenseForm implements OnInit {
     });
     // Só exige o Valor da Parcela se a compra for parcelada
 
- }, {
-    // 4. A mágica do FormRoot vai acionar esta ação automaticamente!
+  }, {
     submission: {
       action: async (field) => {
         try {
@@ -132,13 +149,14 @@ export class ExpenseForm implements OnInit {
 
           const newExpense = { ...valuesForms };
 
+
           // 3. TRATAMENTO DA DATA (Transforma para "YYYY-MM-DD")
           if (newExpense.datePurchase) {
             const data = new Date(newExpense.datePurchase);
             const ano = data.getFullYear();
             const mes = String(data.getMonth() + 1).padStart(2, '0');
             const dia = String(data.getDate()).padStart(2, '0');
-            
+
             newExpense.datePurchase = `${ano}-${mes}-${dia}`;
           }
 
@@ -148,7 +166,7 @@ export class ExpenseForm implements OnInit {
             const horas = String(hora.getHours()).padStart(2, '0');
             const minutos = String(hora.getMinutes()).padStart(2, '0');
             const segundos = String(hora.getSeconds()).padStart(2, '0');
-            
+
             newExpense.hourPurchase = `${horas}:${minutos}:${segundos}`;
           }
 
@@ -159,15 +177,26 @@ export class ExpenseForm implements OnInit {
             newExpense.numberInstallments = null as any;
             newExpense.valueInstallments = null as any;
           }
-          
+
           // Dispara para o Quarkus usando a injeção do seu Service
           const resposta = await firstValueFrom(this.expenseService.addExpense(newExpense));
-          console.log('Sucesso! Despesa salva no banco:', resposta);
-          
+          this.snackBar.open('Despesa cadastrada com sucesso!', 'Fechar', {
+            duration: 3000, // Some sozinha após 3 segundos
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+            panelClass: ['snackbar-sucesso'] // Chama o CSS verde
+          });
+
           // Zera a tela após o sucesso
-          this.cleanForm(); 
+          this.cleanForm();
         } catch (erro) {
           console.error('Falha ao comunicar com a API:', erro);
+          this.snackBar.open('Erro ao cadastrar a despesa. Verifique os dados.', 'Fechar', {
+            duration: 5000, // Deixamos mais tempo para o usuário ler
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+            panelClass: ['snackbar-erro'] // Chama o CSS vermelho
+          });
         }
       }
     }
@@ -189,6 +218,7 @@ export class ExpenseForm implements OnInit {
       topic: { idTopics: 0, name: '' },
       typePayment: { idTypePayments: 0, name: '' }
     });
+    this.expenseForm().reset();
   }
 
   //Quando as variáveis carregarem chama as funções GET de topic e payment type
@@ -197,11 +227,14 @@ export class ExpenseForm implements OnInit {
     this.paymentTypeService.loadPaymentTypes();
   }
 
-  showErros(inputForm: any):String|null{
-    if(inputForm.touched && inputForm.invalid){
-      const errors = inputForm.errors();
-      if(errors && errors.lenght > 0){
-        return errors.message;
+  showErros(inputForm: any): string | null {
+    if (inputForm().touched() && inputForm().invalid()) {
+
+      const errors = inputForm().errors();
+
+      if (errors && errors.length > 0) {
+
+        return errors[0].message;
       }
     }
     return null;

@@ -19,7 +19,6 @@ export class TopicService {
     this.http.get<Topic[]>(this.apiUrl).subscribe({
       next: (topics) =>{
         this.topicsList.set(topics);
-        console.log(topics);
       },
       error:(error) =>{
         console.log("Erro: ",error);

@@ -6,3 +6,28 @@ form{
     display: flex;
     flex-direction: column;
 }
+/* ... seu CSS existente (form-card, form, etc) ... */
+
+/* Notificação de Sucesso (Verde) */
+::ng-deep .snackbar-sucesso {
+    background-color: #4caf50 !important;
+    color: white !important;
+}
+
+::ng-deep .snackbar-sucesso .mat-mdc-snack-bar-action {
+    color: white !important; /* Cor do botão "Fechar" */
+}
+
+/* Notificação de Erro (Vermelha) */
+::ng-deep .snackbar-erro {
+    background-color: #f44336 !important;
+    color: white !important;
+}
+
+::ng-deep .snackbar-erro .mat-mdc-snack-bar-action {
+    color: white !important;
+}
+.erro-sinal {
+    color: #f44336 !important; /* Vermelho padrão de erro */
+    font-size: 12px;
+}

@@ -1,21 +1,61 @@
 .list-card {
-    /* Pode ser um pouco mais largo que o formulário para caber a tabela bem */
-    max-width: 800px; 
-    margin-bottom: 8px;
+    /* Aumentamos a largura para acomodar todas as 12 colunas confortavelmente */
+    max-width: 1200px; 
+    margin: 20px auto; /* Centraliza o card na tela */
+    border-radius: 12px; /* Bordas mais suaves no card */
+}
+
+/* Criamos um contêiner para a tabela não estourar a tela em monitores menores */
+.table-container {
+    overflow-x: auto;
+    width: 100%;
 }
 
 table {
     width: 100%;
-    margin-top: 16px;
+    margin-top: 8px;
+    white-space: nowrap; /* Evita que o texto quebre em várias linhas e deixe a linha torta */
 }
 
-/* Um toque visual simples para diferenciar o que foi pago do que está pendente */
+/* Deixa o cabeçalho mais destacado */
+th.mat-header-cell {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+}
+
+/* =========================================
+   DESIGN DOS BADGES (PÍLULAS COLORIDAS)
+   ========================================= */
 .badge-pago {
-    color: green;
-    font-weight: bold;
+    background-color: #e8f5e9; /* Fundo verde clarinho */
+    color: #2e7d32;            /* Texto verde escuro */
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    display: inline-block;
+    text-align: center;
+    min-width: 60px;
 }
 
 .badge-pendente {
-    color: darkorange;
-    font-weight: bold;
+    background-color: #fff3e0; /* Fundo laranja clarinho */
+    color: #ef6c00;            /* Texto laranja escuro */
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    display: inline-block;
+    text-align: center;
+    min-width: 60px;
+}
+
+.badge-neutro {
+    background-color: #f5f5f5;
+    color: #616161;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
 }
