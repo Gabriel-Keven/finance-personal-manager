@@ -1,0 +1,23 @@
+/* =========================================
+   ESTILOS GLOBAIS DE NOTIFICAÇÃO (SNACKBAR)
+   ========================================= */
+
+/* Notificação de Sucesso (Verde) */
+.snackbar-sucesso {
+    --mdc-snackbar-container-color: #4caf50;
+    --mdc-snackbar-supporting-text-color: #ffffff;
+}
+
+.snackbar-sucesso .mat-mdc-snack-bar-action {
+    color: #ffffff !important; 
+}
+
+/* Notificação de Erro (Vermelha) */
+.snackbar-erro {
+    --mdc-snackbar-container-color: #f44336;
+    --mdc-snackbar-supporting-text-color: #ffffff;
+}
+
+.snackbar-erro .mat-mdc-snack-bar-action {
+    color: #ffffff !important;
+}

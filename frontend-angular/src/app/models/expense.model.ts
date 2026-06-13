@@ -14,5 +14,5 @@ export interface Expense {
     numberInstallments: number,
     valueInstallments:number,
     topic: Topic,
-    typePayment: PaymentType
+    paymentType: PaymentType
 }

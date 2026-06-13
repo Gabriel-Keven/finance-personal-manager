@@ -1,6 +1,7 @@
-import { inject, Injectable,signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Topic } from '../models/topic.model';
+import { Observable, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -15,25 +16,40 @@ export class TopicService {
 
   public topicsList = signal<Topic[]>([]);
 
-  public loadTopics(): void {
-    this.http.get<Topic[]>(this.apiUrl).subscribe({
-      next: (topics) =>{
-        this.topicsList.set(topics);
-      },
-      error:(error) =>{
-        console.log("Erro: ",error);
-      }
-    });
+  public topicSeletected = signal<Topic | null>(null);
+
+  public loadTopics(): Observable<Topic[]> {
+      return this.http.get<Topic[]>(this.apiUrl);
+    }
+
+  public addTopic(topic: Topic): Observable<Topic> {
+    return this.http.post<Topic>(this.apiUrl, topic).pipe(
+      tap({
+        next: (topicUpdate: Topic) => {
+          this.topicsList.update(topicsList => [...topicsList, topicUpdate]);
+        },
+        error: (error) => {
+          console.error("Erro ao inserir o tópico: ", error);
+        },
+      })
+    );
   }
 
-  public addTopic(topic: Topic):void {
-    this.http.post<Topic>(this.apiUrl,topic).subscribe({
-      next:(topicInserted: Topic) => {
-        this.topicsList.update(topicsList => [...topicsList, topicInserted]);
-      },
-      error:(error)=> {
-        console.log("Erro: ", error);
-      }
-    })
+  public deleteTopic(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe();
+  }
+  public updateTopic(id: number, topic: Topic): Observable<Topic> {
+    return this.http.put<Topic>(`${this.apiUrl}/${id}`, topic).pipe(
+      tap({
+        next: (topicUpdate: Topic) => {
+          this.topicsList.update(topicsList => 
+            topicsList.map(t => t.idTopics === id ? topicUpdate : t)
+          );
+        },
+        error: (error) => {
+          console.error("Erro ao atualizar o tópico: ", error);
+        },
+      })
+    );
   }
 }

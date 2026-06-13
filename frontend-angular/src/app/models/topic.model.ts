@@ -1,4 +1,4 @@
 export interface Topic {
-    idTopics: number,
+    idTopics?: number,
     name: string
 }
