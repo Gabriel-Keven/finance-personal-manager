@@ -1,0 +1,32 @@
+<mat-card class="form-card" appearance="outlined">
+    <mat-card-header>
+        <mat-card-title>Formulário para dos tópicos das despesas</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <form [formGroup]="topic" (ngSubmit)="onSubmit()" #formDiretiva="ngForm">
+            <mat-form-field>
+                <mat-label>Nome do tópico</mat-label>
+                <input formControlName="name" type="text" matInput placeholder="Ex. Utensílio doméstico" required />
+            </mat-form-field>
+            @if(topic.invalid && (topic.touched || topic.dirty)){
+            @if (topic.get('name')?.errors?.['required']){
+            <mat-error>O campo é obrigatório</mat-error>
+            }
+            @if(topic.get('name')?.errors?.['minLength']){
+            <mat-error>O mínimo é 4 caracteres.</mat-error>
+            }
+            }
+            <div>
+            </div>
+            <mat-card-actions>
+                <button mat-raised-button color="primary" type="submit" [disabled]="!topic.valid">
+                   @if(topicoSelecionado?.idTopics){
+                        Atualizar Tópico
+                    } @else {
+                        CadastrarTópico
+                    }
+                </button>
+            </mat-card-actions>
+        </form>
+    </mat-card-content>
+</mat-card>

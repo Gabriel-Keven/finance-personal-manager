@@ -105,7 +105,7 @@
 
             <mat-form-field>
                 <mat-label>Tópicos</mat-label>
-                <mat-select [formField]="expenseForm.topic">
+                <mat-select [formField]="expenseForm.topic" [compareWith]="compareTopics">
                     @for (topic of topicsList(); track topic.name) {
                     <mat-option [value]="topic">
                         {{ topic.name }}
@@ -119,15 +119,15 @@
 
             <mat-form-field>
                 <mat-label>Forma de Pagamento</mat-label>
-                <mat-select [formField]="expenseForm.typePayment">
+                <mat-select [formField]="expenseForm.paymentType" [compareWith]="comparePayments">
                     @for (paymentType of paymentsTypeList(); track paymentType.name) {
                     <mat-option [value]="paymentType">
                         {{ paymentType.name }}
                     </mat-option>
                     }
                 </mat-select>
-                @if (showErros(expenseForm.typePayment)) {
-                <mat-error>{{ showErros(expenseForm.typePayment) }}</mat-error>
+                @if (showErros(expenseForm.paymentType)) {
+                <mat-error>{{ showErros(expenseForm.paymentType) }}</mat-error>
                 }
             </mat-form-field>
 

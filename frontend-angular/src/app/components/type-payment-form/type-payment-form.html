@@ -1,0 +1,32 @@
+<mat-card class="form-card" appearance="outlined">
+    <mat-card-header>
+        <mat-card-title>Formulário para cadastrar os tipos de pagamentos</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <form [formGroup]="typePayment" (ngSubmit)="onSubmit()" #formDiretiva="ngForm">
+            <mat-form-field>
+                <mat-label>Nome do tópico</mat-label>
+                <input formControlName="name" type="text" matInput placeholder="Ex. Utensílio doméstico" required />
+            </mat-form-field>
+            @if(typePayment.invalid && (typePayment.touched || typePayment.dirty)){
+            @if (typePayment.get('name')?.errors?.['required']){
+            <mat-error>O campo é obrigatório</mat-error>
+            }
+            @if(typePayment.get('name')?.errors?.['minLength']){
+            <mat-error>O mínimo é 4 caracteres.</mat-error>
+            }
+            }
+            <div>
+            </div>
+            <mat-card-actions>
+                <button mat-raised-button color="primary" type="submit" [disabled]="!typePayment.valid">
+                   @if(tipoPagamentoSelecionado?.idTypePayments){
+                        Atualizar Tipo de Pagamento
+                    } @else {
+                        Cadastrar Tipo pagamento
+                    }
+                </button>
+            </mat-card-actions>
+        </form>
+    </mat-card-content>
+</mat-card>

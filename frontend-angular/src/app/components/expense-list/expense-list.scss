@@ -59,3 +59,23 @@ th.mat-header-cell {
     border-radius: 20px;
     font-size: 12px;
 }
+
+/* Notificação de Sucesso (Verde) */
+::ng-deep .snackbar-sucesso {
+    background-color: #4caf50 !important;
+    color: white !important;
+}
+
+::ng-deep .snackbar-sucesso .mat-mdc-snack-bar-action {
+    color: white !important; /* Cor do botão "Fechar" */
+}
+
+/* Notificação de Erro (Vermelha) */
+::ng-deep .snackbar-erro {
+    background-color: #f44336 !important;
+    color: white !important;
+}
+
+::ng-deep .snackbar-erro .mat-mdc-snack-bar-action {
+    color: white !important;
+}
