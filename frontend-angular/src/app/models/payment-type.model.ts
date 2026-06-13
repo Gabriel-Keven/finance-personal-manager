@@ -1,4 +1,4 @@
 export interface PaymentType {
-    idTypePayments: number,
+    idTypePayments?: number,
     name: string
 }

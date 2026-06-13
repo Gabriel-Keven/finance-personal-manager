@@ -16,19 +16,20 @@ export class ExpenseService {
 
   public expensesList = signal<Expense[]>([]);
 
+  public expenseSelected = signal<Expense | null>(null);
+
   public loadExpenses(): Observable<Expense[]> {
     return this.http.get<Expense[]>(this.apiUrl);
   }
 
-  public deleteExpense(id: number): Observable<void>{
+  public deleteExpense(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  public addExpense(expense: Expense):Observable<Expense> {
+  public addExpense(expense: Expense): Observable<Expense> {
     return this.http.post<Expense>(this.apiUrl, expense).pipe(
       tap({
         next: (expenseInserted: Expense) => {
-          // O serviço espiona o sucesso e atualiza a lista interna dele
           this.expensesList.update(expensesList => [...expensesList, expenseInserted]);
         },
         error: (error) => {
@@ -36,6 +37,9 @@ export class ExpenseService {
         }
       })
     );
+  }
+  updateExpense(id: number, expense: Expense) {
+    return this.http.put<Expense>(`${this.apiUrl}/${id}`, expense);
   }
 
 }

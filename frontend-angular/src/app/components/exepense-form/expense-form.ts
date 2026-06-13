@@ -53,7 +53,7 @@ export class ExpenseForm implements OnInit {
       idTopics: 0,
       name: '',
     },
-    typePayment: {
+    paymentType: {
       idTypePayments: 0,
       name: ''
     }
@@ -85,9 +85,6 @@ export class ExpenseForm implements OnInit {
       message: 'A hora da compra é obrigatória.'
     });
 
-    // ==========================================
-    // SUBSTITUA OS REQUIRED() DE TOPIC E TYPEPAYMENT POR ISTO:
-    // ==========================================
 
     validate(schemaPath.topic, (ctx) => {
       const categoriaSelecionada = ctx.value();
@@ -99,7 +96,7 @@ export class ExpenseForm implements OnInit {
       return null;
     });
 
-    validate(schemaPath.typePayment, (ctx) => {
+    validate(schemaPath.paymentType, (ctx) => {
       const pagamentoSelecionado = ctx.value();
 
       // Se não houver pagamento, ou se o ID ainda for 0
@@ -162,6 +159,7 @@ export class ExpenseForm implements OnInit {
 
           // 4. TRATAMENTO DA HORA (Transforma para "HH:mm:ss")
           if (newExpense.hourPurchase) {
+
             const hora = new Date(newExpense.hourPurchase);
             const horas = String(hora.getHours()).padStart(2, '0');
             const minutos = String(hora.getMinutes()).padStart(2, '0');
@@ -170,32 +168,60 @@ export class ExpenseForm implements OnInit {
             newExpense.hourPurchase = `${horas}:${minutos}:${segundos}`;
           }
 
-          // Se a compra NÃO for parcelada, limpamos o lixo residual.
-          // Forçamos para 'null' para o banco de dados ficar limpo.
-          // Usamos 'as any' para o TypeScript aceitar injetar null num campo do tipo number.
           if (newExpense.installment === false) {
             newExpense.numberInstallments = null as any;
             newExpense.valueInstallments = null as any;
           }
 
-          // Dispara para o Quarkus usando a injeção do seu Service
-          const resposta = await firstValueFrom(this.expenseService.addExpense(newExpense));
-          this.snackBar.open('Despesa cadastrada com sucesso!', 'Fechar', {
-            duration: 3000, // Some sozinha após 3 segundos
-            horizontalPosition: 'center',
-            verticalPosition: 'bottom',
-            panelClass: ['snackbar-sucesso'] // Chama o CSS verde
-          });
+          if (newExpense.idExpense) {
+            
+            // MODO EDIÇÃO (PUT)
+            await firstValueFrom(this.expenseService.updateExpense(newExpense.idExpense, newExpense));
+            
+            this.snackBar.open('Despesa atualizada com sucesso!', 'Fechar', {
+              duration: 3000,
+              horizontalPosition: 'center',
+              verticalPosition: 'bottom',
+              panelClass: ['snackbar-sucesso']
+            });
+
+          } else {
+            
+            // MODO CADASTRO (POST)
+            await firstValueFrom(this.expenseService.addExpense(newExpense));
+            
+            this.snackBar.open('Despesa cadastrada com sucesso!', 'Fechar', {
+              duration: 3000,
+              horizontalPosition: 'center',
+              verticalPosition: 'bottom',
+              panelClass: ['snackbar-sucesso']
+            });
+            
+          }
 
           // Zera a tela após o sucesso
           this.cleanForm();
-        } catch (erro) {
+        } catch (erro: any) {
           console.error('Falha ao comunicar com a API:', erro);
-          this.snackBar.open('Erro ao cadastrar a despesa. Verifique os dados.', 'Fechar', {
-            duration: 5000, // Deixamos mais tempo para o usuário ler
+
+          // 1. Mensagem genérica como plano B
+          let mensagemErro = 'Erro ao cadastrar a despesa. Verifique os dados.';
+
+          // 2. Aponta o radar direto para a propriedade 'detail' do Quarkus
+          if (erro.error && erro.error.detail) {
+            mensagemErro = erro.error.detail;
+          }
+          // 3. Fallback de segurança
+          else if (erro.error && typeof erro.error === 'string') {
+            mensagemErro = erro.error;
+          }
+
+          // 4. Exibe no SnackBar
+          this.snackBar.open(mensagemErro, 'Fechar', {
+            duration: 5000,
             horizontalPosition: 'center',
             verticalPosition: 'bottom',
-            panelClass: ['snackbar-erro'] // Chama o CSS vermelho
+            panelClass: ['snackbar-erro']
           });
         }
       }
@@ -216,7 +242,7 @@ export class ExpenseForm implements OnInit {
       numberInstallments: 0,
       valueInstallments: 0,
       topic: { idTopics: 0, name: '' },
-      typePayment: { idTypePayments: 0, name: '' }
+      paymentType: { idTypePayments: 0, name: '' }
     });
     this.expenseForm().reset();
   }
@@ -225,6 +251,27 @@ export class ExpenseForm implements OnInit {
   ngOnInit(): void {
     this.topicService.loadTopics();
     this.paymentTypeService.loadPaymentTypes();
+    const expenseForEdit = this.expenseService.expenseSelected();
+
+    if (expenseForEdit) {
+
+      const despesaFormatada = { ...expenseForEdit };
+
+      // 2. Converte a Data da Compra de volta para Date
+      if (despesaFormatada.datePurchase) {
+        // Anexamos 'T00:00:00' para o JavaScript interpretar a data no fuso horário local corretamente
+        despesaFormatada.datePurchase = new Date(`${despesaFormatada.datePurchase}T00:00:00`) as any;
+      }
+
+      // 3. Converte a Hora da Compra de volta para Date
+      if (despesaFormatada.hourPurchase) {
+        // Usamos uma data genérica de base (1970-01-01) só para hospedar a hora e o relógio conseguir ler
+        despesaFormatada.hourPurchase = new Date(`1970-01-01T${despesaFormatada.hourPurchase}`) as any;
+      }
+      this.expenseForm().value.set(despesaFormatada);
+      this.expenseService.expenseSelected.set(null);
+    }
+
   }
 
   showErros(inputForm: any): string | null {
@@ -238,5 +285,14 @@ export class ExpenseForm implements OnInit {
       }
     }
     return null;
+  }
+  // Função para comparar os objetos de Tópicos pelo ID
+  compareTopics(o1: any, o2: any): boolean {
+    return o1 && o2 ? o1.idTopics === o2.idTopics : o1 === o2;
+  }
+
+  // Função para comparar as Formas de Pagamento pelo ID
+  comparePayments(o1: any, o2: any): boolean {
+    return o1 && o2 ? o1.idTypePayments === o2.idTypePayments : o1 === o2;
   }
 }
