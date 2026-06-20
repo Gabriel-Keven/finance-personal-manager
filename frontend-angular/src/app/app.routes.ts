@@ -7,12 +7,17 @@ import { TypePaymentForm } from './components/type-payment-form/type-payment-for
 import { TypePaymentsList } from './components/type-payments-list/type-payments-list';
 import { IncomesForm } from './components/incomes-form/incomes-form';
 import { IncomesList } from './components/incomes-list/incomes-list';
+import { MonthlyBalanceList } from './components/monthly-balance-list/monthly-balance-list';
 
 export const routes: Routes = [
   { 
     path: '', 
-    redirectTo: 'extrato', 
+    redirectTo: 'balance', 
     pathMatch: 'full' 
+  },
+  {
+    path: 'balance',
+    component: MonthlyBalanceList
   },
   { 
     path: 'extrato', 

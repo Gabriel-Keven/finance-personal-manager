@@ -29,8 +29,10 @@ export class ExpenseService {
   public addExpense(expense: Expense): Observable<Expense> {
     return this.http.post<Expense>(this.apiUrl, expense).pipe(
       tap({
-        next: (expenseInserted: Expense) => {
-          this.expensesList.update(expensesList => [...expensesList, expenseInserted]);
+        next: () => {
+          // A MÁGICA: Mandamos o Angular recarregar a lista direto do banco.
+          // Assim, ele puxa não apenas a despesa original, mas todas as parcelas futuras geradas!
+          this.loadExpenses().subscribe();
         },
         error: (error) => {
           console.error("Erro ao inserir despesa: ", error);
@@ -38,6 +40,7 @@ export class ExpenseService {
       })
     );
   }
+
   updateExpense(id: number, expense: Expense) {
     return this.http.put<Expense>(`${this.apiUrl}/${id}`, expense);
   }

@@ -1,1 +1,55 @@
-<p>incomes-list works!</p>
+<mat-card class="list-card" appearance="outlined">
+    <mat-card-header>
+        <mat-card-title>Extrato dos ganhos</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+
+        <div class="table-container">
+            <table mat-table [dataSource]="incomes()" class="mat-elevation-z0">
+
+                <ng-container matColumnDef="idIncomes">
+                    <th mat-header-cell *matHeaderCellDef> ID </th>
+                    <td mat-cell *matCellDef="let income"> <strong>#{{ income.idIncomes }}</strong> </td>
+                </ng-container>
+
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef> income </th>
+                    <td mat-cell *matCellDef="let income"> {{ income.name }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="value">
+                    <th mat-header-cell *matHeaderCellDef> Valor </th>
+                    <td mat-cell *matCellDef="let income"> <strong>{{ income.value | currency:'BRL' }}</strong> </td>
+                </ng-container>
+
+                <ng-container matColumnDef="dateReceived">
+                    <th mat-header-cell *matHeaderCellDef> Data </th>
+                    <td mat-cell *matCellDef="let income"> {{ income.dateReceived | date:'dd/MM/yyyy' }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="description">
+                    <th mat-header-cell *matHeaderCellDef> Descrição </th>
+                    <td mat-cell *matCellDef="let income"> {{ income.description }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Ações </th>
+                    <td mat-cell *matCellDef="let income" style="text-align: center;">
+
+                        <button mat-icon-button color="primary" matTooltip="Editar" (click)="editIncome(income)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+
+                        <button mat-icon-button color="warn" matTooltip="Excluir"
+                            (click)="deleteButtonClick(income.idIncomes)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+            </table>
+        </div>
+    </mat-card-content>
+</mat-card>
