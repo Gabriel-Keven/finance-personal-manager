@@ -1,7 +1,7 @@
 export interface Income {
-    idIncomes: number,
+    idIncomes?: number,
     name: string,
     value: number,
-    dateReceived: string,
+    dateReceived: string|null,
     description: string
 }
