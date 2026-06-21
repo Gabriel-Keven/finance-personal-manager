@@ -3,6 +3,8 @@ package br.com.gabriel.resource;
 import java.util.List;
 
 import br.com.gabriel.entity.Expenses;
+import br.com.gabriel.service.ExpensesService;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
@@ -21,6 +23,9 @@ import jakarta.ws.rs.core.Response;
 @Consumes(MediaType.APPLICATION_JSON)
 public class ExpensesResource {
 
+    @Inject
+    ExpensesService expensesService;
+
     @GET
     public List<Expenses> listAll(){
         return Expenses.listAll();
@@ -28,10 +33,9 @@ public class ExpensesResource {
     
     @POST
     @Valid
-    @Transactional
     public Response add (Expenses expense){
-        expense.persist();
-        return Response.status(Response.Status.CREATED).entity(expense).build();
+        Expenses savedExpense = expensesService.addExpense(expense);
+        return Response.status(Response.Status.CREATED).entity(savedExpense).build();
     }
 
     @PUT
@@ -67,5 +71,11 @@ public class ExpensesResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @GET
+    @Path("/{year}/{month}")
+    public List<Expenses> listByPeriod(@PathParam("year") Integer year, @PathParam("month") Integer month) {
+        return expensesService.getExpensesByMonthAndYear(year, month);
     }
 }

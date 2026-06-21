@@ -23,4 +23,9 @@ public class IncomesService {
         }
         return totalIncomes;
     }
+
+    public List<Incomes> getIncomesByMonthAndYear(Integer year, Integer month){
+         return incomesRepository.searchIncomeForMonthAndYear(year, month);
+    }
+
 }

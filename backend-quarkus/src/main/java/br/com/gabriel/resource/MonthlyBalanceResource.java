@@ -44,17 +44,14 @@ public class MonthlyBalanceResource {
     public Response add(@PathParam("month") Integer month, @PathParam("year") Integer year){
         MonthlyBalanceRecord record = monthlyBalanceService.calculateBalanceYearMonth(month, year);
 
-        // Tenta encontrar um balanço já existente para este mês/ano em Brasília
         MonthlyBalance balance = MonthlyBalance.find("month = ?1 and year = ?2", month, year).firstResult();
 
-        // Se não existir, aí sim criamos um novo
         if (balance == null) {
             balance = new MonthlyBalance();
             balance.month = month;
             balance.year = year;
         }
 
-        // Falta persistir na entidade MonthlyBalance se você quiser salvar no banco
         balance.month = record.month();
         balance.year = record.year();
         balance.totalIncomes = record.totalIncomes();

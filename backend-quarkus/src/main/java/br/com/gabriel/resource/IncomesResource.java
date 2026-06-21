@@ -3,6 +3,8 @@ package br.com.gabriel.resource;
 import java.util.List;
 
 import br.com.gabriel.entity.Incomes;
+import br.com.gabriel.service.IncomesService;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
@@ -20,6 +22,9 @@ import jakarta.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class IncomesResource {
+
+    @Inject
+    IncomesService incomesService;
 
     @GET
     public List<Incomes> listAll() {
@@ -61,4 +66,11 @@ public class IncomesResource {
         }
         return Response.status(Response.Status.NO_CONTENT).build();
     }
+
+    @GET
+    @Path("/{year}/{month}")
+    public List<Incomes> listByPeriod(@PathParam("year") Integer year, @PathParam("month") Integer month) {
+        return incomesService.getIncomesByMonthAndYear(year, month);
+    }
+
 }
