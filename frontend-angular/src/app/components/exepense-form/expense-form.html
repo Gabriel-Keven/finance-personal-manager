@@ -1,0 +1,141 @@
+<mat-card class="form-card" appearance="outlined">
+    <mat-card-header>
+        <mat-card-title>Formulário para inserção das despesas</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <form [formRoot]="expenseForm">
+            <mat-form-field>
+                <mat-label>Nome da despesa</mat-label>
+                <input [formField]="expenseForm.name" type="text" matInput placeholder="Ex. Pizza" />
+                @if (showErros(expenseForm.name)) {
+                <mat-error>{{ showErros(expenseForm.name) }}</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field class="example-full-width">
+                <mat-label>Descrição</mat-label>
+                <textarea [formField]="expenseForm.description" matInput
+                    placeholder="Compra para atender uma necessidade..."></textarea>
+                @if (showErros(expenseForm.description)) {
+                <mat-error>{{ showErros(expenseForm.description) }}</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Valor</mat-label>
+                <input [formField]="expenseForm.value" type="number" matInput placeholder="150" />
+                @if (showErros(expenseForm.value)) {
+                <mat-error>{{ showErros(expenseForm.value) }}</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>Data da compra</mat-label>
+                <input [formField]="expenseForm.datePurchase" matInput [matDatepicker]="picker">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+                @if (showErros(expenseForm.datePurchase)) {
+                <mat-error>{{ showErros(expenseForm.datePurchase) }}</mat-error>
+                }
+            </mat-form-field>
+
+
+            <mat-form-field appearance="fill">
+                <mat-label>Hora da compra</mat-label>
+                <input [formField]="expenseForm.hourPurchase" matInput [matTimepicker]="timepicker">
+                <mat-timepicker-toggle matSuffix [for]="timepicker"></mat-timepicker-toggle>
+                <mat-timepicker #timepicker></mat-timepicker>
+                @if (showErros(expenseForm.hourPurchase)) {
+                <mat-error>{{ showErros(expenseForm.hourPurchase) }}</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Pago</mat-label>
+                <mat-select [formField]="expenseForm.paid">
+                    <mat-option [value]="false">Não</mat-option>
+                    <mat-option [value]="true">Sim</mat-option>
+                </mat-select>
+                @if (showErros(expenseForm.paid)) {
+                <mat-error>{{ showErros(expenseForm.paid) }}</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Pagamento Mensal</mat-label>
+                <mat-select [formField]="expenseForm.monthly">
+                    <mat-option [value]="false">Não</mat-option>
+                    <mat-option [value]="true">Sim</mat-option>
+                </mat-select>
+                @if (showErros(expenseForm.monthly)) {
+                <mat-error>{{ showErros(expenseForm.monthly) }}</mat-error>
+                }
+            </mat-form-field>
+            @if(expenseModel().monthly===false){
+
+            <mat-form-field>
+                <mat-label>Compra Parcelada</mat-label>
+                <mat-select [formField]="expenseForm.installment">
+                    <mat-option [value]="false">Não</mat-option>
+                    <mat-option [value]="true">Sim</mat-option>
+                </mat-select>
+                @if (showErros(expenseForm.installment)) {
+                <mat-error>{{ showErros(expenseForm.installment) }}</mat-error>
+                }
+            </mat-form-field>
+            }
+            @if(expenseModel().installment===true){
+
+            <mat-form-field>
+                <mat-label>Número de Parcelas</mat-label>
+                <input [formField]="expenseForm.numberInstallments" type="number" matInput placeholder="Ex. 2" />
+                @if (showErros(expenseForm.numberInstallments)) {
+                <mat-error>{{ showErros(expenseForm.numberInstallments) }}</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Valor das parcelas</mat-label>
+                <input [formField]="expenseForm.valueInstallments" type="number" matInput placeholder="Ex. 200,00" />
+                @if (showErros(expenseForm.valueInstallments)) {
+                <mat-error>{{ showErros(expenseForm.valueInstallments) }}</mat-error>
+                }
+            </mat-form-field>
+            }
+
+            <mat-form-field>
+                <mat-label>Tópicos</mat-label>
+                <mat-select [formField]="expenseForm.topic" [compareWith]="compareTopics">
+                    @for (topic of topicsList(); track topic.name) {
+                    <mat-option [value]="topic">
+                        {{ topic.name }}
+                    </mat-option>
+                    }
+                </mat-select>
+                @if (showErros(expenseForm.topic)) {
+                <mat-error>{{ showErros(expenseForm.topic) }}</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Forma de Pagamento</mat-label>
+                <mat-select [formField]="expenseForm.paymentType" [compareWith]="comparePayments">
+                    @for (paymentType of paymentsTypeList(); track paymentType.name) {
+                    <mat-option [value]="paymentType">
+                        {{ paymentType.name }}
+                    </mat-option>
+                    }
+                </mat-select>
+                @if (showErros(expenseForm.paymentType)) {
+                <mat-error>{{ showErros(expenseForm.paymentType) }}</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-card-actions>
+                <button mat-raised-button color="primary" type="submit">
+                    Cadastrar despesa
+                </button>
+            </mat-card-actions>
+        </form>
+    </mat-card-content>
+</mat-card>

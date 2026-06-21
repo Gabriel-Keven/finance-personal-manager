@@ -1,0 +1,49 @@
+<mat-card class="form-card" appearance="outlined">
+    <mat-card-header>
+        <mat-card-title>Formulário para inserção dos ganhos</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <form [formRoot]="incomeForm">
+            <mat-form-field>
+                <mat-label>Nome do ganho</mat-label>
+                <input [formField]="incomeForm.name" type="text" matInput placeholder="Ex. Salário" />
+                @if (showErros(incomeForm.name)) {
+                <mat-error>{{ showErros(incomeForm.name) }}</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field class="example-full-width">
+                <mat-label>Descrição</mat-label>
+                <textarea [formField]="incomeForm.description" matInput
+                    placeholder="Venda de um item usado..."></textarea>
+                @if (showErros(incomeForm.description)) {
+                <mat-error>{{ showErros(incomeForm.description) }}</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Valor</mat-label>
+                <input [formField]="incomeForm.value" type="number" matInput placeholder="150" />
+                @if (showErros(incomeForm.value)) {
+                <mat-error>{{ showErros(incomeForm.value) }}</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>Data do ganho</mat-label>
+                <input [formField]="incomeForm.dateReceived" matInput [matDatepicker]="picker">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+                @if (showErros(incomeForm.dateReceived)) {
+                <mat-error>{{ showErros(incomeForm.dateReceived) }}</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-card-actions>
+                <button mat-raised-button color="primary" type="submit">
+                    Cadastrar ganho
+                </button>
+            </mat-card-actions>
+        </form>
+    </mat-card-content>
+</mat-card>

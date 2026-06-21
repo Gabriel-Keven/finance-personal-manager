@@ -28,7 +28,7 @@ public class Expenses extends PanacheEntityBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(readOnly = true, description = "Gerado automaticamente pelo banco")
-    public Long idExpenses;
+    public Long idExpense;
     
     @NotBlank(message = "O nome da despesa é obrigatório")
     @Column(nullable = false)
@@ -41,12 +41,11 @@ public class Expenses extends PanacheEntityBase {
     @Column(nullable = false, precision = 10, scale = 2)
     public BigDecimal value;
 
-    @NotNull(message = "A data da compra deve ser obrigaória.")
-    @PastOrPresent(message = "A data da compra não pode ser no futuro")
+    @NotNull(message = "A data da compra deve ser obrigatória.")
     @Column(nullable = false)
     public LocalDate datePurchase;
 
-    @NotNull(message = "A hora da compra deve ser obrigaória.")
+    @NotNull(message = "A hora da compra deve ser obrigatória.")
     @Column(nullable = false)
     public LocalTime hourPurchase;
 

@@ -1,0 +1,54 @@
+.container-master {
+  padding: 20px;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.form-linha {
+  display: flex;
+  gap: 16px;
+  align-items: baseline; /* Alinha o botão com os inputs perfeitamente */
+}
+
+.btn-gerar {
+  height: 50px;
+}
+
+table {
+  width: 100%;
+}
+
+/* Cores Financeiras Básicas */
+.cor-ganho { color: #2e7d32; }
+.cor-despesa { color: #d32f2f; }
+
+/* Estilização da "Pílula" de Status */
+.badge {
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+
+.positivo {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.negativo {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.neutro {
+  background-color: #f5f5f5;
+  color: #616161;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #757575;
+}

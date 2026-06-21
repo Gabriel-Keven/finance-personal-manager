@@ -1,0 +1,43 @@
+.sidenav-container {
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.sidenav {
+  width: 260px;
+  box-shadow: 3px 0 6px rgba(0,0,0,0.1); /* Dá um efeito de profundidade no mobile */
+}
+
+/* Deixa o subcabeçalho mais bonito */
+.mat-mdc-subheader {
+  color: #3f51b5; /* Cor primária do Material */
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+/* Destaca o link da página que o usuário está no momento */
+.active-link {
+  background-color: rgba(63, 81, 181, 0.1); /* Fundo sutil */
+  color: #3f51b5;
+  border-right: 4px solid #3f51b5;
+  
+  mat-icon {
+    color: #3f51b5;
+  }
+}
+
+.top-toolbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 2; /* Mantém a sombra sobre o conteúdo */
+  position: relative;
+}
+
+.content-wrapper {
+  padding: 24px;
+  box-sizing: border-box;
+  
+  /* No celular, reduzimos o padding para aproveitar mais a tela */
+  @media (max-width: 600px) {
+    padding: 16px;
+  }
+}

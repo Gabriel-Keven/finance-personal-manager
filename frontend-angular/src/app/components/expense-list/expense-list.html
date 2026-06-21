@@ -1,0 +1,142 @@
+<mat-card class="list-card" appearance="outlined">
+    <mat-card-header>
+        <mat-card-title>Extrato de Despesas</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+
+        <div style="display: flex; gap: 16px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
+            <mat-form-field appearance="outline">
+                <mat-label>Filtrar por Mês</mat-label>
+                <mat-select [value]="mesSelecionado()" (selectionChange)="mesSelecionado.set($event.value)">
+                    @for (m of meses; track m.value) {
+                        <mat-option [value]="m.value">{{ m.label }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Filtrar por Ano</mat-label>
+                <mat-select [value]="anoSelecionado()" (selectionChange)="anoSelecionado.set($event.value)">
+                    @for (a of anos; track a) {
+                        <mat-option [value]="a">{{ a }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Status do Pagamento</mat-label>
+                <mat-select [value]="statusSelecionado()" (selectionChange)="statusSelecionado.set($event.value)">
+                    <mat-option value="TODOS">Todos</mat-option>
+                    <mat-option value="PAGOS">Apenas Pagos</mat-option>
+                    <mat-option value="PENDENTES">Apenas Pendentes</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <div style="background-color: #f5f5f5; padding: 16px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #f44336;">
+            <h2 style="margin: 0; color: #333;">
+                Total em Despesas: <strong>{{ totalDespesas() | currency:'BRL' }}</strong>
+            </h2>
+            <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">
+                Soma dos valores exibidos na tabela abaixo.
+            </p>
+        </div>
+
+        <div class="table-container">
+            <table mat-table [dataSource]="despesasFiltradas()" class="mat-elevation-z0">
+
+                <ng-container matColumnDef="idExpense">
+                    <th mat-header-cell *matHeaderCellDef> ID </th>
+                    <td mat-cell *matCellDef="let despesa"> <strong>#{{ despesa.idExpense }}</strong> </td>
+                </ng-container>
+
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef> Despesa </th>
+                    <td mat-cell *matCellDef="let despesa"> {{ despesa.name }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="value">
+                    <th mat-header-cell *matHeaderCellDef> Valor </th>
+                    <td mat-cell *matCellDef="let despesa"> <strong>{{ despesa.value | currency:'BRL' }}</strong> </td>
+                </ng-container>
+
+                <ng-container matColumnDef="datePurchase">
+                    <th mat-header-cell *matHeaderCellDef> Data </th>
+                    <td mat-cell *matCellDef="let despesa"> {{ despesa.datePurchase | date:'dd/MM/yyyy' }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="paid">
+                    <th mat-header-cell *matHeaderCellDef> Status </th>
+                    <td mat-cell *matCellDef="let despesa">
+                        @if (despesa.paid) {
+                        <span class="badge-pago">Pago</span>
+                        } @else {
+                        <span class="badge-pendente">Pendente</span>
+                        }
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="monthly">
+                    <th mat-header-cell *matHeaderCellDef> Mensal </th>
+                    <td mat-cell *matCellDef="let despesa">
+                        @if (despesa.monthly) {
+                        <span class="badge-neutro">Sim</span>
+                        } @else {
+                        <span class="badge-neutro">Não</span>
+                        }
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="installment">
+                    <th mat-header-cell *matHeaderCellDef> Parcelado </th>
+                    <td mat-cell *matCellDef="let despesa">
+                        @if (despesa.installment) {
+                        <span class="badge-neutro">Sim</span>
+                        } @else {
+                        <span class="badge-neutro">Não</span>
+                        }
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="numberInstallments">
+                    <th mat-header-cell *matHeaderCellDef> Parcelas </th>
+                    <td mat-cell *matCellDef="let despesa">
+                        {{ despesa.numberInstallments ? despesa.numberInstallments + 'x' : '-' }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="valueInstallments">
+                    <th mat-header-cell *matHeaderCellDef> Vlr. Parcela </th>
+                    <td mat-cell *matCellDef="let despesa">
+                        {{ despesa.valueInstallments ? (despesa.valueInstallments | currency:'BRL') : '-' }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="topic">
+                    <th mat-header-cell *matHeaderCellDef> Tópico </th>
+                    <td mat-cell *matCellDef="let despesa"> {{ despesa.topic?.name }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="paymentType">
+                    <th mat-header-cell *matHeaderCellDef> Pagamento </th>
+                    <td mat-cell *matCellDef="let despesa"> {{ despesa.paymentType?.name }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Ações </th>
+                    <td mat-cell *matCellDef="let despesa" style="text-align: center;">
+                        <button mat-icon-button color="primary" matTooltip="Editar" (click)="editExpense(despesa)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button color="warn" matTooltip="Excluir" (click)="deleteButtonClick(despesa.idExpense)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+            </table>
+        </div>
+    </mat-card-content>
+</mat-card>

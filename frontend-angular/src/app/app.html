@@ -1,0 +1,92 @@
+@if (authService.loggedIn()) {
+
+  <mat-sidenav-container class="sidenav-container">
+    
+    <mat-sidenav #drawer class="sidenav" fixedInViewport
+        [attr.role]="isHandset() ? 'dialog' : 'navigation'"
+        [mode]="isHandset() ? 'over' : 'side'"
+        [opened]="isHandset() === false">
+        
+      <mat-toolbar color="primary" class="menu-header">Menu</mat-toolbar>
+      
+      <mat-nav-list>
+        <a mat-list-item routerLink="/balance" routerLinkActive="active-link" (click)="fecharMenuNoCelular(drawer)">
+          <mat-icon matListItemIcon>dashboard</mat-icon>
+          <div matListItemTitle>Balanço</div>
+        </a>
+
+        <mat-divider></mat-divider>
+        <div mat-subheader>Despesas</div>
+        
+        <a mat-list-item routerLink="/extrato" routerLinkActive="active-link" (click)="fecharMenuNoCelular(drawer)">
+          <mat-icon matListItemIcon>receipt_long</mat-icon>
+          <div matListItemTitle>Minhas Despesas</div>
+        </a>
+        <a mat-list-item routerLink="/cadastrar" routerLinkActive="active-link" (click)="fecharMenuNoCelular(drawer)">
+          <mat-icon matListItemIcon>add_shopping_cart</mat-icon>
+          <div matListItemTitle>Nova Despesa</div>
+        </a>
+
+        <mat-divider></mat-divider>
+        <div mat-subheader>Rendas</div>
+
+        <a mat-list-item routerLink="/listar-rendas" routerLinkActive="active-link" (click)="fecharMenuNoCelular(drawer)">
+          <mat-icon matListItemIcon>account_balance_wallet</mat-icon>
+          <div matListItemTitle>Minhas Rendas</div>
+        </a>
+        <a mat-list-item routerLink="/cadastrar-rendas" routerLinkActive="active-link" (click)="fecharMenuNoCelular(drawer)">
+          <mat-icon matListItemIcon>payments</mat-icon>
+          <div matListItemTitle>Nova Renda</div>
+        </a>
+
+        <mat-divider></mat-divider>
+        <div mat-subheader>Configurações</div>
+
+        <a mat-list-item routerLink="/listar-topicos" routerLinkActive="active-link" (click)="fecharMenuNoCelular(drawer)">
+          <mat-icon matListItemIcon>category</mat-icon>
+          <div matListItemTitle>Tópicos</div>
+        </a>
+        <a mat-list-item routerLink="/cadastrar-topicos" routerLinkActive="active-link" (click)="fecharMenuNoCelular(drawer)">
+          <mat-icon matListItemIcon>add</mat-icon>
+          <div matListItemTitle>Novo Tópico</div>
+        </a>
+        <a mat-list-item routerLink="/listar-tipos-pagamentos" routerLinkActive="active-link" (click)="fecharMenuNoCelular(drawer)">
+          <mat-icon matListItemIcon>credit_card</mat-icon>
+          <div matListItemTitle>Tipos de Pagamento</div>
+        </a>
+        <a mat-list-item routerLink="/cadastrar-tipos-pagamentos" routerLinkActive="active-link" (click)="fecharMenuNoCelular(drawer)">
+          <mat-icon matListItemIcon>add</mat-icon>
+          <div matListItemTitle>Novo Pagamento</div>
+        </a>
+
+      </mat-nav-list>
+    </mat-sidenav>
+
+    <mat-sidenav-content>
+      
+      <mat-toolbar color="primary" class="top-toolbar">
+        @if (isHandset()) {
+          <button type="button" aria-label="Abrir menu" mat-icon-button (click)="drawer.toggle()">
+            <mat-icon aria-label="Ícone de menu lateral">menu</mat-icon>
+          </button>
+        }
+        <span style="flex: 1 1 auto;">Sistema Financeiro</span>
+        
+        <button mat-icon-button (click)="authService.logout()" aria-label="Sair do sistema">
+          <mat-icon>logout</mat-icon>
+        </button>
+      </mat-toolbar>
+
+      <div class="content-wrapper">
+        <router-outlet></router-outlet>
+      </div>
+
+    </mat-sidenav-content>
+    
+  </mat-sidenav-container>
+
+} @else {
+  
+  <router-outlet></router-outlet>
+  
+}

@@ -1,0 +1,81 @@
+.list-card {
+    /* Aumentamos a largura para acomodar todas as 12 colunas confortavelmente */
+    max-width: 1200px; 
+    margin: 20px auto; /* Centraliza o card na tela */
+    border-radius: 12px; /* Bordas mais suaves no card */
+}
+
+/* Criamos um contêiner para a tabela não estourar a tela em monitores menores */
+.table-container {
+    overflow-x: auto;
+    width: 100%;
+}
+
+table {
+    width: 100%;
+    margin-top: 8px;
+    white-space: nowrap; /* Evita que o texto quebre em várias linhas e deixe a linha torta */
+}
+
+/* Deixa o cabeçalho mais destacado */
+th.mat-header-cell {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+}
+
+/* =========================================
+   DESIGN DOS BADGES (PÍLULAS COLORIDAS)
+   ========================================= */
+.badge-pago {
+    background-color: #e8f5e9; /* Fundo verde clarinho */
+    color: #2e7d32;            /* Texto verde escuro */
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    display: inline-block;
+    text-align: center;
+    min-width: 60px;
+}
+
+.badge-pendente {
+    background-color: #fff3e0; /* Fundo laranja clarinho */
+    color: #ef6c00;            /* Texto laranja escuro */
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    display: inline-block;
+    text-align: center;
+    min-width: 60px;
+}
+
+.badge-neutro {
+    background-color: #f5f5f5;
+    color: #616161;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+/* Notificação de Sucesso (Verde) */
+::ng-deep .snackbar-sucesso {
+    background-color: #4caf50 !important;
+    color: white !important;
+}
+
+::ng-deep .snackbar-sucesso .mat-mdc-snack-bar-action {
+    color: white !important; /* Cor do botão "Fechar" */
+}
+
+/* Notificação de Erro (Vermelha) */
+::ng-deep .snackbar-erro {
+    background-color: #f44336 !important;
+    color: white !important;
+}
+
+::ng-deep .snackbar-erro .mat-mdc-snack-bar-action {
+    color: white !important;
+}
