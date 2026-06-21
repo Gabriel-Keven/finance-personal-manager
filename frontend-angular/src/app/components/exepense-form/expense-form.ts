@@ -247,31 +247,30 @@ export class ExpenseForm implements OnInit {
     this.expenseForm().reset();
   }
 
-  //Quando as variáveis carregarem chama as funções GET de topic e payment type
-  ngOnInit(): void {
-    this.topicService.loadTopics();
-    this.paymentTypeService.loadPaymentTypes();
+ ngOnInit(): void {
+    
+    // CORREÇÃO: Adicionado o .subscribe() para disparar as requisições
+    this.topicService.loadTopics().subscribe();
+    this.paymentTypeService.loadPaymentTypes().subscribe();
+    
     const expenseForEdit = this.expenseService.expenseSelected();
 
     if (expenseForEdit) {
-
       const despesaFormatada = { ...expenseForEdit };
 
       // 2. Converte a Data da Compra de volta para Date
       if (despesaFormatada.datePurchase) {
-        // Anexamos 'T00:00:00' para o JavaScript interpretar a data no fuso horário local corretamente
         despesaFormatada.datePurchase = new Date(`${despesaFormatada.datePurchase}T00:00:00`) as any;
       }
 
       // 3. Converte a Hora da Compra de volta para Date
       if (despesaFormatada.hourPurchase) {
-        // Usamos uma data genérica de base (1970-01-01) só para hospedar a hora e o relógio conseguir ler
         despesaFormatada.hourPurchase = new Date(`1970-01-01T${despesaFormatada.hourPurchase}`) as any;
       }
+      
       this.expenseForm().value.set(despesaFormatada);
       this.expenseService.expenseSelected.set(null);
     }
-
   }
 
   showErros(inputForm: any): string | null {

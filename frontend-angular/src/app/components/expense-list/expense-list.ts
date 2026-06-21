@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, effect, computed } from '@angular/core';
 import { Expense } from '../../models/expense.model';
 import { firstValueFrom } from 'rxjs';
 import { CurrencyPipe, DatePipe } from '@angular/common';
@@ -9,8 +9,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 //Services
 import { ExpenseService } from '../../services/expense.service';
@@ -18,70 +19,92 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-expense-list',
-  imports: [MatTableModule, MatCardModule, CurrencyPipe, DatePipe, MatButtonModule, MatTooltipModule, MatIconModule],
+  standalone: true,
+  imports: [
+    MatTableModule, MatCardModule, CurrencyPipe, DatePipe, 
+    MatButtonModule, MatTooltipModule, MatIconModule,
+    MatSelectModule, MatFormFieldModule
+  ],
   templateUrl: './expense-list.html',
   styleUrl: './expense-list.scss'
 })
 export class ExpenseList implements OnInit {
 
   private expenseService = inject(ExpenseService);
-
-  public expenses = signal<Expense[]>([]);
-
   private snackBar = inject(MatSnackBar);
-
   private router = inject(Router);
 
-  public displayedColumns: string[] = [
-    'idExpense',
-    'name',
-    'value',
-    'datePurchase',
-    'paid',
-    'monthly',
-    'installment',
-    'numberInstallments',
-    'valueInstallments',
-    'topic',
-    'paymentType',
-    'actions'];
+  // 1. Controle dos Filtros
+  private dataAtual = new Date();
+  public mesSelecionado = signal<number>(this.dataAtual.getMonth() + 1);
+  public anoSelecionado = signal<number>(this.dataAtual.getFullYear());
+  public statusSelecionado = signal<string>('TODOS'); 
 
-  ngOnInit(): void {
-    this.carregarDespesas();
-  }
+  // 2. A LISTA FILTRADA AUTOMÁTICA
+  public despesasFiltradas = computed(() => {
+    const listaBruta = this.expenseService.expensesList();
+    const status = this.statusSelecionado();
 
-  public async carregarDespesas() {
-    try {
-      const dados = await firstValueFrom(this.expenseService.loadExpenses());
-      this.expenses.set(dados);
-    } catch (erro) {
-      console.error('Falha ao buscar o extrato de despesas:', erro);
+    if (status === 'PAGOS') {
+      return listaBruta.filter(despesa => despesa.paid === true);
     }
+    if (status === 'PENDENTES') {
+      return listaBruta.filter(despesa => despesa.paid === false);
+    }
+    
+    return listaBruta;
+  });
+
+  // 3. A SOMA AUTOMÁTICA (Resumo do Mês)
+  public totalDespesas = computed(() => {
+    return this.despesasFiltradas().reduce((soma, despesa) => soma + despesa.value, 0);
+  });
+
+  // 4. Arrays para os Selects
+  public meses = [
+    { value: 1, label: 'Janeiro' }, { value: 2, label: 'Fevereiro' },
+    { value: 3, label: 'Março' }, { value: 4, label: 'Abril' },
+    { value: 5, label: 'Maio' }, { value: 6, label: 'Junho' },
+    { value: 7, label: 'Julho' }, { value: 8, label: 'Agosto' },
+    { value: 9, label: 'Setembro' }, { value: 10, label: 'Outubro' },
+    { value: 11, label: 'Novembro' }, { value: 12, label: 'Dezembro' }
+  ];
+  public anos = [2024, 2025, 2026, 2027, 2028, 2029, 2030];
+
+  public displayedColumns: string[] = [
+    'idExpense', 'name', 'value', 'datePurchase', 'paid', 'monthly',
+    'installment', 'numberInstallments', 'valueInstallments', 'topic',
+    'paymentType', 'actions'
+  ];
+
+  constructor() {
+    effect(() => {
+      this.expenseService.loadExpenses(this.anoSelecionado(), this.mesSelecionado()).subscribe();
+    });
   }
+
+  ngOnInit(): void {}
 
   async deleteButtonClick(id: number) {
-
     try {
-      const result = await firstValueFrom(this.expenseService.deleteExpense(id));
+      await firstValueFrom(this.expenseService.deleteExpense(id));
 
       this.snackBar.open('Despesa excluída com sucesso!', 'Fechar', {
-        duration: 3000, // Some sozinha após 3 segundos
+        duration: 3000, 
         horizontalPosition: 'center',
         verticalPosition: 'bottom',
-        panelClass: ['snackbar-sucesso'] // Chama o CSS verde
+        panelClass: ['snackbar-sucesso'] 
       });
-      console.log("Atual: ", this.expenses());
-      const expeseseAfterDelete = this.expenses().filter((expense) => expense.idExpense != id);
-      console.log(" expeseseAfterDelete", expeseseAfterDelete);
-      this.expenses.set(expeseseAfterDelete);
+      
+      this.expenseService.loadExpenses(this.anoSelecionado(), this.mesSelecionado()).subscribe();
+      
     } catch (error) {
       this.snackBar.open('Erro ao excluir a despesa', 'Fechar', {
-        duration: 3000, // Some sozinha após 3 segundos
+        duration: 3000, 
         horizontalPosition: 'center',
         verticalPosition: 'bottom',
-        panelClass: ['snackbar-erro'] // Chama o CSS verde
+        panelClass: ['snackbar-erro'] 
       });
-
     }
   }
 
@@ -89,5 +112,4 @@ export class ExpenseList implements OnInit {
     this.expenseService.expenseSelected.set(expense);
     this.router.navigate(['/cadastrar']);
   }
-
 }
