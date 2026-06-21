@@ -8,51 +8,64 @@ import { TypePaymentsList } from './components/type-payments-list/type-payments-
 import { IncomesForm } from './components/incomes-form/incomes-form';
 import { IncomesList } from './components/incomes-list/incomes-list';
 import { MonthlyBalanceList } from './components/monthly-balance-list/monthly-balance-list';
+import { authGuard } from './auth.guard';
+import { LoginComponent } from './components/login.component/login.component';
+
 
 export const routes: Routes = [
   { 
     path: '', 
-    redirectTo: 'balance', 
+    redirectTo: '/login', 
     pathMatch: 'full' 
+  },
+  // 2. A ROTA QUE FALTAVA (Livre de bloqueios, sem o canActivate)
+  {
+    path: 'login',
+    component: LoginComponent
   },
   {
     path: 'balance',
-    component: MonthlyBalanceList
+    component: MonthlyBalanceList,
+    canActivate: [authGuard]
   },
   { 
     path: 'extrato', 
-    component: ExpenseList 
+    component: ExpenseList,
+    canActivate: [authGuard]
   },
   { 
     path: 'cadastrar', 
-    component: ExpenseForm 
+    component: ExpenseForm,
+    canActivate: [authGuard]
   },
   {
     path: 'cadastrar-topicos',
-    component: TopicForm
+    component: TopicForm,
+    canActivate: [authGuard]
   },
   {
     path: 'listar-topicos',
-    component: TopicList
+    component: TopicList,
+    canActivate: [authGuard]
   },
   {
     path: 'cadastrar-tipos-pagamentos',
-    component: TypePaymentForm
+    component: TypePaymentForm,
+    canActivate: [authGuard]
   },
   {
     path: 'listar-tipos-pagamentos',
-    component: TypePaymentsList
+    component: TypePaymentsList,
+    canActivate: [authGuard]
   },
   {
     path: 'cadastrar-rendas',
-    component: IncomesForm
+    component: IncomesForm,
+    canActivate: [authGuard]
   },
   {
     path: 'listar-rendas',
-    component: IncomesList
+    component: IncomesList,
+    canActivate: [authGuard]
   },
-  { 
-    path: '**', 
-    redirectTo: 'extrato' 
-  }
 ];

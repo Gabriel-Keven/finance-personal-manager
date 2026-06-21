@@ -18,10 +18,12 @@ export class TopicService {
 
   public topicSeletected = signal<Topic | null>(null);
 
-  public loadTopics(): Observable<Topic[]> {
-      return this.http.get<Topic[]>(this.apiUrl);
-    }
-
+public loadTopics(): Observable<Topic[]> {
+      return this.http.get<Topic[]>(this.apiUrl).pipe(
+        // A MÁGICA: Salva o resultado do banco de dados no Sinal
+        tap(topics => this.topicsList.set(topics))
+      );
+  }
   public addTopic(topic: Topic): Observable<Topic> {
     return this.http.post<Topic>(this.apiUrl, topic).pipe(
       tap({

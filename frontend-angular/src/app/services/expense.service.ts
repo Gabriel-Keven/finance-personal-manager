@@ -8,18 +8,17 @@ import { Observable, tap } from 'rxjs';
 })
 export class ExpenseService {
 
-  //Injeção de dependência
   private http = inject(HttpClient);
-
-  //URL da api do backend
   private apiUrl = 'http://localhost:8080/expenses';
 
   public expensesList = signal<Expense[]>([]);
-
   public expenseSelected = signal<Expense | null>(null);
 
-  public loadExpenses(): Observable<Expense[]> {
-    return this.http.get<Expense[]>(this.apiUrl);
+  // Agora recebe os parâmetros de filtro e envia para a URL
+  public loadExpenses(year: number, month: number): Observable<Expense[]> {
+    return this.http.get<Expense[]>(`${this.apiUrl}/${year}/${month}`).pipe(
+      tap(expenses => this.expensesList.set(expenses))
+    );
   }
 
   public deleteExpense(id: number): Observable<void> {
@@ -30,9 +29,9 @@ export class ExpenseService {
     return this.http.post<Expense>(this.apiUrl, expense).pipe(
       tap({
         next: () => {
-          // A MÁGICA: Mandamos o Angular recarregar a lista direto do banco.
-          // Assim, ele puxa não apenas a despesa original, mas todas as parcelas futuras geradas!
-          this.loadExpenses().subscribe();
+          // Após salvar (e o Quarkus gerar as parcelas), recarregamos a lista do mês atual
+          const dataAtual = new Date();
+          this.loadExpenses(dataAtual.getFullYear(), dataAtual.getMonth() + 1).subscribe();
         },
         error: (error) => {
           console.error("Erro ao inserir despesa: ", error);
@@ -44,5 +43,4 @@ export class ExpenseService {
   updateExpense(id: number, expense: Expense) {
     return this.http.put<Expense>(`${this.apiUrl}/${id}`, expense);
   }
-
 }

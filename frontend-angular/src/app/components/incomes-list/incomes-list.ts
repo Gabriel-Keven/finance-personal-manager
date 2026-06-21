@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, effect, computed } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { Income } from '../../models/income.model';
 import { CurrencyPipe, DatePipe } from '@angular/common';
@@ -9,8 +9,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSelectModule } from '@angular/material/select'; 
+import { MatFormFieldModule } from '@angular/material/form-field'; 
 
 //Services
 import { IncomesService } from '../../services/incomes.service';
@@ -18,19 +19,41 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-incomes-list',
-  imports: [MatTableModule, MatCardModule, CurrencyPipe, DatePipe, MatButtonModule, MatTooltipModule, MatIconModule],
+  standalone: true,
+  imports: [
+    MatTableModule, MatCardModule, CurrencyPipe, DatePipe, 
+    MatButtonModule, MatTooltipModule, MatIconModule,
+    MatSelectModule, MatFormFieldModule
+  ],
   templateUrl: './incomes-list.html',
   styleUrl: './incomes-list.scss'
 })
 export class IncomesList implements OnInit {
 
   private incomesService = inject(IncomesService);
-
-  public incomes = signal<Income[]>([]);
-
   private snackBar = inject(MatSnackBar);
-
   private router = inject(Router);
+
+  private dataAtual = new Date();
+  public mesSelecionado = signal<number>(this.dataAtual.getMonth() + 1);
+  public anoSelecionado = signal<number>(this.dataAtual.getFullYear());
+
+  public incomesLista = this.incomesService.incomesList;
+
+  // SOMA AUTOMÁTICA (Resumo de Ganhos do Mês)
+  public totalGanhos = computed(() => {
+    return this.incomesLista().reduce((soma, ganho) => soma + ganho.value, 0);
+  });
+
+  public meses = [
+    { value: 1, label: 'Janeiro' }, { value: 2, label: 'Fevereiro' },
+    { value: 3, label: 'Março' }, { value: 4, label: 'Abril' },
+    { value: 5, label: 'Maio' }, { value: 6, label: 'Junho' },
+    { value: 7, label: 'Julho' }, { value: 8, label: 'Agosto' },
+    { value: 9, label: 'Setembro' }, { value: 10, label: 'Outubro' },
+    { value: 11, label: 'Novembro' }, { value: 12, label: 'Dezembro' }
+  ];
+  public anos = [2024, 2025, 2026, 2027, 2028, 2029, 2030];
 
   public displayedColumns: string[] = [
     'idIncomes',
@@ -38,40 +61,36 @@ export class IncomesList implements OnInit {
     'value',
     'dateReceived',
     'description',
-    'actions'];
+    'actions'
+  ];
 
-  ngOnInit(): void {
-    this.loadIncomes();
+  constructor() {
+    effect(() => {
+      this.incomesService.loadIncomes(this.anoSelecionado(), this.mesSelecionado()).subscribe();
+    });
   }
 
-  public async loadIncomes() {
-    try {
-      const dados = await firstValueFrom(this.incomesService.loadIncomes());
-      this.incomes.set(dados);
-    } catch (erro) {
-      console.error('Falha ao buscar o extrato dos ganhos:', erro);
-    }
+  ngOnInit(): void {
   }
 
   async deleteButtonClick(id: number) {
-
     try {
-      const result = await firstValueFrom(this.incomesService.deleteIncome(id));
+      await firstValueFrom(this.incomesService.deleteIncome(id));
 
-      this.snackBar.open('Ganho excluída com sucesso!', 'Fechar', {
-        duration: 3000, // Some sozinha após 3 segundos
+      this.snackBar.open('Ganho excluído com sucesso!', 'Fechar', {
+        duration: 3000,
         horizontalPosition: 'center',
         verticalPosition: 'bottom',
       });
-      const incomesAfterDelete = this.incomes().filter((income) => income.idIncomes != id);
-      this.incomes.set(incomesAfterDelete);
+      
+      this.incomesService.loadIncomes(this.anoSelecionado(), this.mesSelecionado()).subscribe();
+      
     } catch (error) {
       this.snackBar.open('Erro ao excluir o ganho', 'Fechar', {
-        duration: 3000, // Some sozinha após 3 segundos
+        duration: 3000,
         horizontalPosition: 'center',
         verticalPosition: 'bottom',
       });
-
     }
   }
 
@@ -79,5 +98,4 @@ export class IncomesList implements OnInit {
     this.incomesService.incomesSelected.set(income);
     this.router.navigate(['/cadastrar-rendas']);
   }
-
 }

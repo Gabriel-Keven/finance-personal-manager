@@ -1,0 +1,27 @@
+<div class="login-container">
+  <mat-card class="login-card" appearance="outlined">
+    <mat-card-header style="justify-content: center; margin-bottom: 20px;">
+      <mat-card-title>Sistema Financeiro</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form (ngSubmit)="fazerLogin()">
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>E-mail</mat-label>
+          <input matInput type="email" [ngModel]="email()" (ngModelChange)="email.set($event)" name="email" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Senha</mat-label>
+          <input matInput type="password" [ngModel]="password()" (ngModelChange)="password.set($event)" name="password" required>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" type="submit" class="full-width" style="padding: 24px 0; font-size: 16px;">
+          Entrar
+        </button>
+        
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

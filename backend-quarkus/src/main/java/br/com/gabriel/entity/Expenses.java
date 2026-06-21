@@ -42,7 +42,6 @@ public class Expenses extends PanacheEntityBase {
     public BigDecimal value;
 
     @NotNull(message = "A data da compra deve ser obrigatória.")
-    @PastOrPresent(message = "A data da compra não pode ser no futuro")
     @Column(nullable = false)
     public LocalDate datePurchase;
 

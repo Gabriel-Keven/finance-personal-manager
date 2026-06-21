@@ -18,9 +18,11 @@ export class PaymentTypeService {
   public typePaymentsList = signal<PaymentType[]>([]);
 
   public loadPaymentTypes(): Observable<PaymentType[]> {
-    return this.http.get<PaymentType[]>(this.apiUrl);
+    return this.http.get<PaymentType[]>(this.apiUrl).pipe(
+      // A MÁGICA: Salva o resultado do banco de dados no Sinal
+      tap(payments => this.typePaymentsList.set(payments))
+    );
   }
-
  public addPaymentType(paymentType: PaymentType): Observable<PaymentType> {
      return this.http.post<PaymentType>(this.apiUrl, paymentType).pipe(
        tap({
