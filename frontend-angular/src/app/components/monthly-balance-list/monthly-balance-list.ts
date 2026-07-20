@@ -1,106 +1,125 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CurrencyPipe, DecimalPipe, NgClass } from '@angular/common';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
 
-// Angular Material
-import { MatTableModule } from '@angular/material/table';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
-import { MatSelectModule } from '@angular/material/select';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatIconModule } from '@angular/material/icon';
+import { GraphsMonthlyBalance } from '../graphs-monthly-balance/graphs-monthly-balance';
+import { ChartData } from 'chart.js';
 
-// Serviço
-import { MonthlyBalanceService } from '../../services/monthly-balance.service';
+import { ExpenseService } from '../../services/expense.service';
+import { IncomesService } from '../../services/incomes.service';
 
 @Component({
   selector: 'app-monthly-balance-list',
   standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    MatTableModule,
-    MatButtonModule,
-    MatIconModule,
-    MatCardModule,
-    MatSelectModule,
-    MatFormFieldModule,
-    MatSnackBarModule,
-    CurrencyPipe,
-    DecimalPipe,
-    NgClass
-  ],
+  imports: [CommonModule, MatCardModule, MatIconModule, CurrencyPipe, DatePipe, GraphsMonthlyBalance],
   templateUrl: './monthly-balance-list.html',
   styleUrl: './monthly-balance-list.scss'
 })
 export class MonthlyBalanceList implements OnInit {
 
-  private monthlyBalanceService = inject(MonthlyBalanceService);
-  private snackBar = inject(MatSnackBar);
+  private expenseService = inject(ExpenseService);
+  private incomesService = inject(IncomesService);
 
-  public balancesList = this.monthlyBalanceService.balancesList;
+  // Sinais de Resumo
+  public totalRendas = signal<number>(0);
+  public totalDespesas = signal<number>(0);
+  public saldoAtual = signal<number>(0);
 
-  public displayedColumns: string[] = ['month', 'year', 'totalIncomes', 'totalExpenses', 'finalBalance', 'status', 'actions'];
+  // Controle do Mês Selecionado (Formato YYYY-MM)
+  public mesAnoInput = signal<string>('');
 
-  // 3. Listas para preencher os Selects do Formulário
-  public months = [
-    { value: 1, label: 'Janeiro' }, { value: 2, label: 'Fevereiro' },
-    { value: 3, label: 'Março' }, { value: 4, label: 'Abril' },
-    { value: 5, label: 'Maio' }, { value: 6, label: 'Junho' },
-    { value: 7, label: 'Julho' }, { value: 8, label: 'Agosto' },
-    { value: 9, label: 'Setembro' }, { value: 10, label: 'Outubro' },
-    { value: 11, label: 'Novembro' }, { value: 12, label: 'Dezembro' }
-  ];
+  // Listas para a "Visualização Antiga" (Tabelas)
+  public despesasLista = signal<any[]>([]);
+  public rendasLista = signal<any[]>([]);
 
-  public years = [2024, 2025, 2026, 2027, 2028, 2029, 2030];
-
-  balanceForm = new FormGroup({
-    month: new FormControl<number | null>(null, Validators.required),
-    year: new FormControl<number | null>(null, Validators.required)
-  });
+  // Gráficos
+  public pieChartData: ChartData<'pie', number[], string | string[]> = {
+    labels: [], datasets: [{ data: [] }]
+  };
+  public barChartData: ChartData<'bar'> = {
+    labels: ['Balanço do Mês'],
+    datasets: [
+      { data: [0], label: 'Rendas', backgroundColor: '#4caf50' },
+      { data: [0], label: 'Despesas', backgroundColor: '#f44336' }
+    ]
+  };
 
   ngOnInit(): void {
-    this.monthlyBalanceService.loadBalances().subscribe({
-      error: () => this.exibirNotificacao('Erro ao carregar o histórico de balanços.')
-    });
+    const dataAtual = new Date();
+    const ano = dataAtual.getFullYear();
+    const mes = dataAtual.getMonth() + 1;
+    
+    // Define o valor inicial do input de mês (ex: "2026-08")
+    this.mesAnoInput.set(`${ano}-${mes.toString().padStart(2, '0')}`);
+    
+    this.carregarDadosDoMes(ano, mes);
   }
 
-  onSubmit(): void {
-    if (this.balanceForm.invalid) {
-      return;
+  // Função chamada quando o usuário troca o mês na tela
+  public mudarMes(event: Event) {
+    const input = (event.target as HTMLInputElement).value;
+    if (input) {
+      this.mesAnoInput.set(input);
+      const [ano, mes] = input.split('-');
+      this.carregarDadosDoMes(parseInt(ano), parseInt(mes));
     }
-
-    // Extrai os valores usando o "!" pois o Validators.required garante que não são nulos
-    const month = this.balanceForm.value.month!;
-    const year = this.balanceForm.value.year!;
-
-    this.monthlyBalanceService.generateBalance(month, year).subscribe({
-      next: () => {
-        this.exibirNotificacao(`Balanço de ${month}/${year} gerado com sucesso!`);
-        this.balanceForm.reset();
-      },
-      error: () => {
-        this.exibirNotificacao('Erro ao processar o cálculo no servidor!');
-      }
-    });
   }
 
-  deleteBalance(id: number | undefined): void {
-    if (!id) return;
+  private async carregarDadosDoMes(ano: number, mes: number) {
+    try {
+      const [despesas, rendas] = await Promise.all([
+        firstValueFrom(this.expenseService.loadExpenses(ano, mes)),
+        firstValueFrom(this.incomesService.loadIncomes(ano, mes))
+      ]);
 
-    if (confirm('Tem certeza que deseja excluir este balanço da sua visão geral?')) {
-      this.monthlyBalanceService.deleteBalance(id).subscribe({
-        next: () => this.exibirNotificacao('Balanço excluído com sucesso!'),
-        error: () => this.exibirNotificacao('Erro ao excluir o balanço.')
+      // Guarda os dados para a tabela HTML
+      this.despesasLista.set(despesas);
+      this.rendasLista.set(rendas);
+
+      // Calcula os Totais
+      const somaDespesas = despesas.reduce((acc, d) => acc + d.value, 0);
+      const somaRendas = rendas.reduce((acc, r) => acc + r.value, 0);
+
+      this.totalDespesas.set(somaDespesas);
+      this.totalRendas.set(somaRendas);
+      this.saldoAtual.set(somaRendas - somaDespesas);
+
+      // Atualiza Gráfico de Barras
+      this.barChartData.datasets[0].data = [somaRendas];
+      this.barChartData.datasets[1].data = [somaDespesas];
+      this.barChartData = { ...this.barChartData };
+
+      // Atualiza Gráfico de Pizza
+      const gastosPorTopico: { [key: string]: number } = {};
+      despesas.forEach(d => {
+        const nomeTopico = d.topic ? d.topic.name : 'Outros';
+        if (gastosPorTopico[nomeTopico]) {
+          gastosPorTopico[nomeTopico] += d.value;
+        } else {
+          gastosPorTopico[nomeTopico] = d.value;
+        }
       });
-    }
-  }
 
-  private exibirNotificacao(mensagem: string): void {
-    this.snackBar.open(mensagem, 'Fechar', {
-      duration: 3000,
-      horizontalPosition: 'center',
-      verticalPosition: 'bottom',
-    });
+      this.pieChartData.labels = Object.keys(gastosPorTopico);
+      this.pieChartData.datasets[0].data = Object.values(gastosPorTopico);
+
+      this.pieChartData.datasets[0].backgroundColor = [
+        '#FF6384', // Rosa/Vermelho
+        '#36A2EB', // Azul
+        '#FFCE56', // Amarelo
+        '#4BC0C0', // Verde Água
+        '#9966FF', // Roxo
+        '#FF9F40', // Laranja
+        '#8D6E63', // Marrom
+        '#009688'  // Verde Escuro
+      ];
+
+      this.pieChartData = { ...this.pieChartData };
+
+    } catch (error) {
+      console.error('Erro ao montar o Dashboard', error);
+    }
   }
 }
