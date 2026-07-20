@@ -2,6 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Expense } from '../models/expense.model';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +10,7 @@ import { Observable, tap } from 'rxjs';
 export class ExpenseService {
 
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/expenses';
+  private apiUrl = `${environment.apiUrl}/expenses`;
 
   public expensesList = signal<Expense[]>([]);
   public expenseSelected = signal<Expense | null>(null);
