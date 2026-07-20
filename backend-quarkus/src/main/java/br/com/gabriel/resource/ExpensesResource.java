@@ -1,5 +1,7 @@
 package br.com.gabriel.resource;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 import br.com.gabriel.entity.Expenses;
@@ -78,4 +80,52 @@ public class ExpensesResource {
     public List<Expenses> listByPeriod(@PathParam("year") Integer year, @PathParam("month") Integer month) {
         return expensesService.getExpensesByMonthAndYear(year, month);
     }
+
+    @POST
+    @Path("/clone/{year}/{month}")
+    @Transactional
+    public Response cloneFixedExpenses(@PathParam("year") int year, @PathParam("month") int month) {
+        
+        int prevYear = year;
+        int prevMonth = month - 1;
+        
+        if (prevMonth == 0) {
+            prevMonth = 12;
+            prevYear--;
+        }
+
+        List<Expenses> despesasAnteriores = Expenses.find(
+            "YEAR(datePurchase) = ?1 AND MONTH(datePurchase) = ?2 AND monthly = true", 
+            prevYear, prevMonth
+        ).list();
+
+        if (despesasAnteriores.isEmpty()) {
+            return Response.ok("Nenhuma despesa fixa encontrada no mês anterior.").build();
+        }
+
+        // 3. Clona e salva as novas despesas
+        for (Expenses despesaAntiga : despesasAnteriores) {
+            Expenses novaDespesa = new Expenses();
+            
+            // Copia os dados essenciais
+            novaDespesa.name = despesaAntiga.name;
+            novaDespesa.value = despesaAntiga.value;
+            novaDespesa.topic = despesaAntiga.topic;
+            novaDespesa.hourPurchase = despesaAntiga.hourPurchase;
+            novaDespesa.monthly = true; 
+            novaDespesa.installment = false; 
+            novaDespesa.paid = false; 
+
+            // Se o mês passado tinha 31 dias e o atual tem 30, o Math.min ajusta automaticamente.
+            LocalDate dataOriginal = despesaAntiga.datePurchase;
+            int diaVencimento = Math.min(dataOriginal.getDayOfMonth(), YearMonth.of(year, month).lengthOfMonth());
+            
+            novaDespesa.datePurchase = LocalDate.of(year, month, diaVencimento);
+
+            novaDespesa.persist();
+        }
+
+        return Response.status(Response.Status.CREATED).build();
+    }
+
 }
