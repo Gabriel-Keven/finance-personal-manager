@@ -1,5 +1,5 @@
 # ESTÁGIO 1: Construção (Baixa dependências e compila o Java)
-FROM maven:3.9-eclipse-temurin-21-alpine AS build
+FROM maven:3.9-eclipse-temurin-25-alpine AS build
 WORKDIR /app
 
 # Copia o arquivo de dependências e baixa (faz cache)
@@ -11,7 +11,7 @@ COPY src ./src
 RUN mvn package -DskipTests
 
 # ESTÁGIO 2: Execução (Cria um contêiner leve só com o que precisa rodar)
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 WORKDIR /app
 
 # Copia apenas as pastas otimizadas geradas pelo Quarkus
