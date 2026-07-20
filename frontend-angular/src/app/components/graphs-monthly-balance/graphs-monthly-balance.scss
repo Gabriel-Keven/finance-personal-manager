@@ -1,0 +1,19 @@
+.charts-container {
+  display: grid;
+  /* Deixa os gráficos mais largos que os cards de cima */
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 20px;
+
+  .chart-card {
+    padding: 16px;
+    border-radius: 8px;
+  }
+}
+
+/* Ajuste específico para telas de celular */
+@media (max-width: 600px) {
+  .charts-container {
+    /* No celular, os gráficos ocupam a largura total (1 coluna) */
+    grid-template-columns: 1fr;
+  }
+}

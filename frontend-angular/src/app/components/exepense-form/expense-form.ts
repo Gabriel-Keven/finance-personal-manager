@@ -294,4 +294,5 @@ export class ExpenseForm implements OnInit {
   comparePayments(o1: any, o2: any): boolean {
     return o1 && o2 ? o1.idTypePayments === o2.idTypePayments : o1 === o2;
   }
+
 }

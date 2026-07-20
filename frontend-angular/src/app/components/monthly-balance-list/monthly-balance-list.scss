@@ -1,54 +1,129 @@
-.container-master {
-  padding: 20px;
-}
-
-.mb-20 {
-  margin-bottom: 20px;
-}
-
-.form-linha {
+/* --- Novo Cabeçalho e Seletor de Mês --- */
+.header-section {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
   gap: 16px;
-  align-items: baseline; /* Alinha o botão com os inputs perfeitamente */
 }
 
-.btn-gerar {
-  height: 50px;
+.month-selector {
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 8px 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+
+  mat-icon {
+    color: #3f51b5;
+    margin-right: 8px;
+  }
+
+  .native-date-picker {
+    border: none;
+    outline: none;
+    font-size: 16px;
+    font-family: inherit;
+    color: #333;
+    background: transparent;
+    cursor: pointer;
+  }
 }
 
-table {
+/* --- Visualização Antiga (Tabelas) --- */
+.tables-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.table-wrapper {
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+
+  h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.custom-table {
   width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  th, td {
+    padding: 12px 8px;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  th {
+    color: #666;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 12px;
+  }
+
+  tbody tr:hover {
+    background-color: #f9f9f9;
+  }
+}
+.dashboard-container {
+  padding: 16px;
 }
 
-/* Cores Financeiras Básicas */
-.cor-ganho { color: #2e7d32; }
-.cor-despesa { color: #d32f2f; }
+.summary-cards {
+  display: grid;
+  /* Cria colunas responsivas que se ajustam sozinhas */
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
 
-/* Estilização da "Pílula" de Status */
-.badge {
-  padding: 6px 12px;
-  border-radius: 16px;
-  font-weight: bold;
-  font-size: 0.85rem;
-}
+  mat-card {
+    border-radius: 8px;
+    
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
 
-.positivo {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-}
+    h2 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: bold;
+      color: #333;
+    }
+  }
 
-.negativo {
-  background-color: #ffebee;
-  color: #d32f2f;
-}
-
-.neutro {
-  background-color: #f5f5f5;
-  color: #616161;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 40px;
-  color: #757575;
+  /* Cores dos ícones */
+  .card-receita mat-icon { color: #4caf50; }
+  .card-despesa mat-icon { color: #f44336; }
+  
+  /* Lógica visual do card de Saldo */
+  .card-saldo {
+    color: white;
+    .card-header { color: rgba(255, 255, 255, 0.8); }
+    h2 { color: white; }
+  }
+  
+  /* As classes dinâmicas que o Angular injeta */
+  .saldo-positivo { background-color: #2e7d32; } /* Verde escuro */
+  .saldo-negativo { background-color: #c62828; } /* Vermelho escuro */
 }

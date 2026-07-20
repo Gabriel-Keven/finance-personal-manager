@@ -112,4 +112,27 @@ export class ExpenseList implements OnInit {
     this.expenseService.expenseSelected.set(expense);
     this.router.navigate(['/cadastrar']);
   }
+
+  public async clonarDespesasFixas() {
+    // Uma confirmação simples para evitar cliques acidentais
+    const confirmacao = confirm('Deseja importar as despesas fixas (Mensal: Sim) do mês passado para este mês?');
+    
+    if (confirmacao) {
+      try {
+        const ano = this.anoSelecionado(); 
+        const mes = this.mesSelecionado(); 
+
+        await firstValueFrom(this.expenseService.cloneFixedEpenses(ano, mes));
+        
+        alert('Despesas fixas importadas com sucesso!');
+        
+        this.expenseService.loadExpenses(this.anoSelecionado(), this.mesSelecionado()).subscribe(); 
+
+      } catch (error) {
+        console.error('Erro ao clonar despesas:', error);
+        alert('Erro ao importar as despesas. Verifique se o back-end está rodando.');
+      }
+    }
+  }
+
 }
