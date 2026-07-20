@@ -43,4 +43,8 @@ export class ExpenseService {
   updateExpense(id: number, expense: Expense) {
     return this.http.put<Expense>(`${this.apiUrl}/${id}`, expense);
   }
+
+  cloneFixedEpenses(year: number, month:number){
+    return this.http.post(`${this.apiUrl}/clone/${year}/${month}`,null);
+  }
 }
