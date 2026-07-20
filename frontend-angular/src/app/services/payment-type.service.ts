@@ -2,6 +2,7 @@ import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { PaymentType } from '../models/payment-type.model';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +12,7 @@ export class PaymentTypeService {
   private http = inject(HttpClient);
 
   //URL da api do backend
-  private apiUrl = 'http://localhost:8080/type-payments';
+  private apiUrl = `${environment.apiUrl}/type-payments`;
 
   public paymentTypeSelected = signal<PaymentType | null>(null);
 

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { MonthlyBalance } from '../models/monthly-balance.model';
 import { Observable, tap } from 'rxjs';
 import { DecimalPipe } from '@angular/common';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +11,7 @@ import { DecimalPipe } from '@angular/common';
 export class MonthlyBalanceService {
 
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/monthly-balance';
+  private apiUrl = `${environment.apiUrl}/monthly-balance`;
 
   // Cofre de estado global
   public balancesList = signal<MonthlyBalance[]>([]);

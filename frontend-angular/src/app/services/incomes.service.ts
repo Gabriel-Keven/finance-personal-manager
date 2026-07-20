@@ -2,6 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Income } from '../models/income.model';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +13,7 @@ export class IncomesService {
   private http = inject(HttpClient);
 
   //URL da api do backend
-  private apiUrl = 'http://localhost:8080/incomes';
+   private apiUrl = `${environment.apiUrl}/incomes`;
 
   public incomesList = signal<Income[]>([]);
 
